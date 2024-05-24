@@ -11,6 +11,6 @@ MySql 연동 상태. 다만 이 점을 지켜줄 것.
 
 <p>drop schema if exists firstproject_db;</p>
 <p>create schema firstproject_db;</p>
-<p>use firstproject_db;</p>
+<p>use firstproject_db;</p><br>
 
 <h3>이 코드를 한 번 꼭 실행해 data를 리프레시 시킬 것. 그렇지 않으면 에러가 남.</h3>
