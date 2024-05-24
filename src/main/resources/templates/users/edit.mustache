@@ -1,0 +1,35 @@
+{{>layouts/header}}
+
+{{#user}}
+    <form class="container" action="/users/update" method="post">
+        <input name="id" type="hidden" value="{{id}}"> id: {{id}}
+        <div class="mb-3">
+            <label class="form-label">회원 아이디: {{id}}</label>
+            <input type="text" class="form-control" name="userId" value="{{userId}}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">비밀번호</label>
+            <input type="text" class="form-control" name="password" value="{{password}}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">이름</label>
+            <input type="text" class="form-control" name="name" value="{{name}}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">나이</label>
+            <input type="text" class="form-control" name="age" value="{{age}}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">전화번호</label>
+            <input type="text" class="form-control" name="phoneNumber" value="{{phoneNumber}}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">이메일</label>
+            <input type="text" class="form-control" name="email" value="{{email}}">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <a href="/users/{{id}}">Back</a>
+    </form>
+{{/user}}
+
+{{>layouts/footer}}
