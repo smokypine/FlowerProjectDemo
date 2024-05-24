@@ -7,7 +7,7 @@ spring.datasource.password=drkim4926^ <-------- !!!!
 
 이 두 부분을 본인 컴퓨터의 MySql에 맞는 걸로 변환시키기.
 
-2.FlowerApplication.java를 실행시키기 이전에 MySql에서
+2. FlowerApplication.java를 실행시키기 이전에 MySql에서
 
 drop schema if exists firstproject_db;
 create schema firstproject_db;
