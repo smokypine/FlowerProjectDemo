@@ -1,3 +1,5 @@
+stream.mustache
+
 {{>layouts/header}}
 
 <h1>Stream Viewer</h1>
@@ -6,13 +8,13 @@
 <button id="fetchUdpDataButton">Fetch UDP Data</button>
 <div id="udpDataContainer" style="display: none;">
     <h3>UDP Data</h3>
-    <p id="udpData"></p><br>
+    <div id="screenshotsContainer"></div>
 </div>
 
 <script>
     const streamImg = document.getElementById('stream');
     const udpDataContainer = document.getElementById('udpDataContainer');
-    const udpDataElement = document.getElementById('udpData');
+    const screenshotsContainer = document.getElementById('screenshotsContainer');
     const fetchUdpDataButton = document.getElementById('fetchUdpDataButton');
 
     streamImg.onerror = function() {
@@ -25,8 +27,17 @@
             .then(() => fetch('/api/udp-data'))
             .then(response => response.json())
             .then(data => {
-                console.log('브라우저 콘솔 로그:', data.udpData);
-                udpDataElement.textContent = data.udpData.join(", ");
+                console.log('브라우저 콘솔 로그:', data);
+                screenshotsContainer.innerHTML = '';  // Clear previous data
+                data.forEach(item => {
+                    const img = document.createElement('img');
+                    img.src = 'data:image/jpeg;base64,' + item.imageBase64;
+                    img.alt = 'Screenshot';
+                    const p = document.createElement('p');
+                    p.textContent = 'Captured at: ' + item.timestamp;
+                    screenshotsContainer.appendChild(img);
+                    screenshotsContainer.appendChild(p);
+                });
                 udpDataContainer.style.display = 'block';  // 데이터 수신 후 컨테이너를 보여줍니다.
             })
             .catch(error => console.error('Error fetching UDP data:', error));
