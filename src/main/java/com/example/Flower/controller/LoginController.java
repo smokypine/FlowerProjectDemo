@@ -1,6 +1,11 @@
 package com.example.Flower.controller;
 
+<<<<<<< HEAD
 import com.example.Flower.service.UsersService;
+=======
+import com.example.Flower.entity.Users;
+import com.example.Flower.repository.UsersRepository;
+>>>>>>> origin/main
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +16,17 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
+<<<<<<< HEAD
 public class LoginController extends SessionController{
 
     @Autowired
     private UsersService usersService;
+=======
+public class LoginController {
+
+    @Autowired
+    private UsersRepository userRepository;
+>>>>>>> origin/main
 
     // 로그인 페이지로 이동
     @GetMapping("/login")
@@ -28,8 +40,14 @@ public class LoginController extends SessionController{
         String userId = request.getParameter("userId");
         String password = request.getParameter("password");
 
+<<<<<<< HEAD
         // 서비스 계층을 통해 사용자 인증
         if (usersService.validateUser(userId, password)) {
+=======
+        // 데이터베이스에서 사용자 정보를 가져와서 비교
+        Users user = userRepository.findByUserId(userId);
+        if (user != null && user.getPassword().equals(password)) {
+>>>>>>> origin/main
             HttpSession session = request.getSession();
             session.setAttribute("userId", userId);
             return "redirect:/"; // 로그인 성공 시 홈 페이지로 리다이렉트
@@ -46,4 +64,26 @@ public class LoginController extends SessionController{
         session.invalidate(); // 세션 무효화
         return "redirect:/"; // 로그아웃 후 홈 페이지로 리다이렉트
     }
+<<<<<<< HEAD
 }
+=======
+
+    // 로그인 상태를 뷰로 전달합니다.
+    @ModelAttribute("loggedIn")
+    public boolean loggedIn(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        return session != null && session.getAttribute("userId") != null;
+    }
+
+    // 사용자가 로그인한 사용자 ID를 모델에 추가합니다.
+    @ModelAttribute("loggedInUserId")
+    public String loggedInUserId(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null && session.getAttribute("userId") != null) {
+            return (String) session.getAttribute("userId");
+        } else {
+            return null;
+        }
+    }
+}
+>>>>>>> origin/main
