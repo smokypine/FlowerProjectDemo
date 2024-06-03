@@ -7,12 +7,14 @@
 <div id="udpDataContainer" style="display: none;">
     <h3>UDP Data</h3>
     <p id="udpData"></p><br>
+    <img id="udpScreenshot" alt="Screenshot not available">
 </div>
 
 <script>
     const streamImg = document.getElementById('stream');
     const udpDataContainer = document.getElementById('udpDataContainer');
     const udpDataElement = document.getElementById('udpData');
+    const udpScreenshotElement = document.getElementById('udpScreenshot');
     const fetchUdpDataButton = document.getElementById('fetchUdpDataButton');
 
     streamImg.onerror = function() {
@@ -27,6 +29,9 @@
             .then(data => {
                 console.log('브라우저 콘솔 로그:', data.udpData);
                 udpDataElement.textContent = data.udpData.join(", ");
+                if (data.screenshot) {
+                    udpScreenshotElement.src = 'data:image/jpeg;base64,' + data.screenshot;
+                }
                 udpDataContainer.style.display = 'block';  // 데이터 수신 후 컨테이너를 보여줍니다.
             })
             .catch(error => console.error('Error fetching UDP data:', error));

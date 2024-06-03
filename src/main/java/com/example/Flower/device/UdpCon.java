@@ -1,10 +1,16 @@
 package com.example.Flower.device;
 
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +19,7 @@ public class UdpCon {
     private volatile List<String> latestDataList;
     private DatagramSocket datagramSocket;
     private boolean isRunning;
+    private String latestScreenshotBase64;
 
     public UdpCon() {
         // 최신 데이터를 저장하기 위한 리스트를 초기화합니다.
@@ -35,7 +42,8 @@ public class UdpCon {
                 datagramSocket.send(outPacket);
                 datagramSocket.receive(inPacket);
                 String receivedData = new String(inPacket.getData()).trim();
-                latestDataList.add(receivedData);
+                processReceivedData(receivedData);
+
                 isRunning = false;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -59,5 +67,43 @@ public class UdpCon {
     public synchronized String getLatestData() {
         // 최신 데이터를 반환합니다.
         return latestDataList.isEmpty() ? null : latestDataList.get(latestDataList.size() - 1);
+    }
+
+    public synchronized String getLatestScreenshotBase64() {
+        return latestScreenshotBase64;
+    }
+
+    private void processReceivedData(String data) {
+        if (data.matches("\\[tag:0,\\{\\d+\\.\\d+,\\d+\\.\\d+,\\d+,\\d+,\\d+\\}\\]")) {
+            latestDataList.add(data);
+            try {
+                latestScreenshotBase64 = getScreenshotFromStreamUrl("http://175.123.202.85:20800/screenshot");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.err.println("Invalid data format: " + data);
+        }
+    }
+
+    private String getScreenshotFromStreamUrl(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+
+        try (InputStream inputStream = connection.getInputStream();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+
+            byte[] imageBytes = outputStream.toByteArray();
+            return Base64.getEncoder().encodeToString(imageBytes);
+        } finally {
+            connection.disconnect();
+        }
     }
 }
