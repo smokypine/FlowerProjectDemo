@@ -1,61 +1,73 @@
 package com.example.Flower.controller;
 
 import com.example.Flower.device.UdpCon;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import com.example.Flower.device.UdpCon;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import java.io.IOException;
+import java.net.UnknownHostException;
 
-
-@Slf4j
+// REST 컨트롤러 클래스
 @RestController
-public class UdpController extends SessionController{
-    @Autowired
-    private UdpCon udpCon;
-
-    @GetMapping("/api/start-udp")
-    @ResponseBody
-    public void startUdp() {
-        // UDP 통신을 시작합니다.
-        udpCon.start("175.123.202.85", 20920);
+public class UdpController {
+    // UdpCon 인스턴스 생성
+    private final UdpCon udpCon;
+    public UdpController() {
+        this.udpCon = new UdpCon();
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
-    @GetMapping("/api/udp-data")
-    @ResponseBody
-    public Map<String, Object> getUdpData() {
-        Map<String, Object> response = new HashMap<>();
-        // 최신 UDP 데이터를 가져와서 반환합니다.
-        List<String> data = udpCon.getLatestDataList();
-        String screenshotBase64 = udpCon.getLatestScreenshotBase64();
-        response.put("udpData", data);
-        response.put("screenshot", screenshotBase64);
-
-        // 서버 콘솔에 데이터를 출력합니다.
-        System.out.println("서버 콘솔 로그: " + data);
-
-        return response;
+    // 센서 데이터를 가져오는 엔드포인트
+    @GetMapping("/udp/sensor")
+    public String[] getSensorData(@RequestParam String ipAddress, @RequestParam int port) {
+        try {
+            // UdpCon의 start 메소드를 호출하여 센서 데이터 요청 및 반환
+            return udpCon.start(ipAddress, port, 0); // 0은 센서 데이터를 의미
+        } catch (UnknownHostException e) {
+            // UnknownHostException 발생 시, 예외 메시지 반환
+            return new String[]{"UnknownHostException: " + e.getMessage()};
+        } catch (IOException e) {
+            // IOException 발생 시, 예외 메시지 반환
+            return new String[]{"IOException: " + e.getMessage()};
+        }
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
-    @GetMapping("/api/udp-stop")
-    public void getUdpStop() {
-        log.info("stop udp");
-        udpCon.stop();
+    // 액추에이터 데이터를 가져오는 엔드포인트
+    @GetMapping("/udp/actuator")
+    public String[] getActuatorData(@RequestParam String ipAddress, @RequestParam int port) {
+        try {
+            // UdpCon의 start 메소드를 호출하여 액추에이터 데이터 요청 및 반환
+            return udpCon.start(ipAddress, port, 1); // 1은 액추에이터 데이터를 의미
+        } catch (UnknownHostException e) {
+            // UnknownHostException 발생 시, 예외 메시지 반환
+            return new String[]{"UnknownHostException: " + e.getMessage()};
+        } catch (IOException e) {
+            // IOException 발생 시, 예외 메시지 반환
+            return new String[]{"IOException: " + e.getMessage()};
+        }
     }
 
-    @Autowired
-    private HttpServletRequest request;
+    @GetMapping("/udp/screenshot")
+    public String captureScreenshot() {
+        try {
+            // 스트리밍 중인 영상의 스크린샷을 찍기
+            String screenshotBase64 = udpCon.captureScreenshot("http://175.123.202.85:20800/stream");
+            return screenshotBase64;
+        } catch (IOException e) {
+            // IOException 발생 시, 예외 메시지 반환
+            return "Error capturing screenshot: " + e.getMessage();
+        }
+    }
+}
 
-
+// 페이지 컨트롤러 클래스
+@Controller
+class PageController {
+    // 스트리밍 페이지를 보여주는 엔드포인트
+    @GetMapping("/streaming")
+    public String showStreamingPage() {
+        // "stream" 템플릿 반환
+        return "stream";
+    }
 }

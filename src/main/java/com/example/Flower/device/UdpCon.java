@@ -1,93 +1,74 @@
 package com.example.Flower.device;
 
-
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.URL;
-import java.util.ArrayList;
+import java.net.*;
 import java.util.Base64;
-import java.util.List;
-import org.springframework.stereotype.Component;
 
-@Component
 public class UdpCon {
-    private volatile List<String> latestDataList;
-    private DatagramSocket datagramSocket;
-    private boolean isRunning;
-    private String latestScreenshotBase64;
+    // UDP 통신을 수행하는 클래스
+    public String[] start(String ipAddress, int ipPort, int dataType) throws IOException, UnknownHostException {
+        //dataType은 센서 데이터(0), 엑추데이터(1)로 구분
 
-    public UdpCon() {
-        // 최신 데이터를 저장하기 위한 리스트를 초기화합니다.
-        this.latestDataList = new ArrayList<>();
+        // DatagramSocket 및 InetAddress 객체 생성
+        DatagramSocket datagramSocket = new DatagramSocket();
+        InetAddress serverAddress = InetAddress.getByName(ipAddress);
+
+        // 데이터를 저장할 바이트 배열 생성
+        byte[] msg = new byte[100];
+        msg[0] = (byte) dataType;
+
+        // 전송용 DatagramPacket 및 수신용 DatagramPacket 생성
+        DatagramPacket outPacket = new DatagramPacket(msg, 1, serverAddress, ipPort);
+        DatagramPacket inPacket = new DatagramPacket(msg, msg.length);
+
+        // DatagramPacket 전송
+        datagramSocket.send(outPacket);
+        // DatagramPacket 수신
+        datagramSocket.receive(inPacket);
+
+        // 수신된 데이터 출력 및 파싱
+        System.out.println("Received Data: " + new String(inPacket.getData()));
+        String tmp = new String(inPacket.getData());
+
+        String[] parsedData = this.parseData(tmp);
+
+        // DatagramSocket 닫기
+        datagramSocket.close();
+        return parsedData;
     }
 
-    public void start(String serverIp, int serverPort) {
-        isRunning = true;
+    // 수신된 데이터를 파싱하는 메소드
+    public String[] parseData(String stringData) {
+        // 수신된 문자열 데이터를 쉼표로 분리하여 배열에 저장
+        String[] dataArr = stringData.split(",");
 
-        new Thread(() -> {
-            try {
-                // UDP 소켓을 생성하고 데이터를 수신합니다.
-                latestDataList.clear();  // 기존 데이터를 비웁니다.
-                datagramSocket = new DatagramSocket();
-                InetAddress serverAddress = InetAddress.getByName(serverIp);
-                byte[] msg = new byte[100];
-                DatagramPacket outPacket = new DatagramPacket(msg, 1, serverAddress, serverPort);
-                DatagramPacket inPacket = new DatagramPacket(msg, msg.length);
-
-                datagramSocket.send(outPacket);
-                datagramSocket.receive(inPacket);
-                String receivedData = new String(inPacket.getData()).trim();
-                processReceivedData(receivedData);
-
-                isRunning = false;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
-
-    public void stop() {
-        isRunning = false;
-        if (datagramSocket != null) {
-            // UDP 소켓을 닫습니다.
-            datagramSocket.close();
+        // 데이터의 타입에 따라 다른 처리 수행
+        if (dataArr[ScForm.TAG].equals(ScForm.TAGSENSOR)) {
+            // 센서 데이터인 경우
+            System.out.println("tag : " + dataArr[ScForm.TAG]);
+            System.out.println("temp : " + dataArr[ScForm.TEMP]);
+            System.out.println("wet : " + dataArr[ScForm.WET]);
+            System.out.println("light : " + dataArr[ScForm.LIGHT]);
+            System.out.println("daylight : " + dataArr[ScForm.DAYLIGHT]);
+        } else if (dataArr[ScForm.TAG].equals(ScForm.TAGACTUATOR)) {
+            // 액추에이터 데이터인 경우
+            System.out.println("tag : " + dataArr[ScForm.TAG]);
+            System.out.println("moter : " + dataArr[ScForm.MOTERTYPE]);
+            System.out.println("result : " + dataArr[ScForm.RESULT]);
+            System.out.println("stat : " + dataArr[ScForm.STATUS]);
         }
+        return dataArr;
     }
 
-    public synchronized List<String> getLatestDataList() {
-        // 최신 데이터 리스트의 복사본을 반환합니다.
-        return new ArrayList<>(latestDataList);
-    }
-
-    public synchronized String getLatestData() {
-        // 최신 데이터를 반환합니다.
-        return latestDataList.isEmpty() ? null : latestDataList.get(latestDataList.size() - 1);
-    }
-
-    public synchronized String getLatestScreenshotBase64() {
-        return latestScreenshotBase64;
-    }
-
-    private void processReceivedData(String data) {
-        if (data.matches("\\[tag:0,\\{\\d+\\.\\d+,\\d+\\.\\d+,\\d+,\\d+,\\d+\\}\\]")) {
-            latestDataList.add(data);
-            try {
-                latestScreenshotBase64 = getScreenshotFromStreamUrl("http://175.123.202.85:20800/screenshot");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.err.println("Invalid data format: " + data);
-        }
-    }
-
-    private String getScreenshotFromStreamUrl(String urlString) throws IOException {
-        URL url = new URL(urlString);
+    // 스트리밍 중인 영상의 스크린샷을 찍는 메소드
+    public String captureScreenshot(String streamUrl) throws IOException {
+        URL url = new URL(streamUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
 
@@ -105,5 +86,19 @@ public class UdpCon {
         } finally {
             connection.disconnect();
         }
+    }
+    // 화면에 스크린샷 이미지를 출력하는 메소드
+    public void displayScreenshot(String base64Image) throws IOException {
+        // Base64로 인코딩된 이미지를 디코딩하여 Image 객체로 변환
+        byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+        ByteArrayInputStream bis = new ByteArrayInputStream(imageBytes);
+        Image image = ImageIO.read(bis);
+
+        // 이미지를 화면에 출력
+        JFrame frame = new JFrame("Screenshot");
+        JLabel label = new JLabel(new ImageIcon(image));
+        frame.getContentPane().add(label);
+        frame.pack();
+        frame.setVisible(true);
     }
 }

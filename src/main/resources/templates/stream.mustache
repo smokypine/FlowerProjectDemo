@@ -2,40 +2,59 @@
 
 <h1>Stream Viewer</h1>
 <img id="stream" src="http://175.123.202.85:20800/stream.mjpg" alt="Stream not available">
-<br><br>
-<button id="fetchUdpDataButton">Fetch UDP Data</button>
-<div id="udpDataContainer" style="display: none;">
-    <h3>UDP Data</h3>
-    <p id="udpData"></p><br>
-    <img id="udpScreenshot" alt="Screenshot not available">
+
+<h1>UDP Streaming</h1>
+<div>
+    <button onclick="fetchSensorData()">Get Sensor Data</button>
+    <button onclick="fetchActuatorData()">Get Actuator Data</button>
+    <button onclick="fetchScreenshot()">Capture Screenshot</button>
 </div>
 
+<div id="sensorData"></div>
+<div id="actuatorData"></div>
+<img id="screenshotImg" src="" alt="Screenshot" style="display: none;">
+
 <script>
-    const streamImg = document.getElementById('stream');
-    const udpDataContainer = document.getElementById('udpDataContainer');
-    const udpDataElement = document.getElementById('udpData');
-    const udpScreenshotElement = document.getElementById('udpScreenshot');
-    const fetchUdpDataButton = document.getElementById('fetchUdpDataButton');
+    const ipAddress = "175.123.202.85";
+    const port = 20920;
 
-    streamImg.onerror = function() {
-        streamImg.src = 'http://175.123.202.85:20800/stream.mjpg?' + new Date().getTime(); // Force reload on error
-    };
+//센서 데이터 버튼 클릭
+function fetchSensorData() {
+    const url = `/udp/sensor?ipAddress=${ipAddress}&port=${port}&dataType=0`;
+    fetchAndDisplayData(url, 'sensorData', 'Sensor');
+}
 
-    fetchUdpDataButton.onclick = function() {
-        fetch('/api/start-udp')
-            .then(() => new Promise(resolve => setTimeout(resolve, 1000)))  // 1초 대기 후 데이터 요청
-            .then(() => fetch('/api/udp-data'))
-            .then(response => response.json())
+//엑추 데이터 버튼 클릭
+function fetchActuatorData() {
+    const url = `/udp/actuator?ipAddress=${ipAddress}&port=${port}&dataType=1`;
+    fetchAndDisplayData(url, 'actuatorData', 'Actuator');
+}
+
+function fetchAndDisplayData(url, containerId, dataTypeName) {
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById(containerId);
+            container.textContent = JSON.stringify(data);
+
+            // 데이터 유형을 출력
+            const dataTypeInfo = document.createElement('p');
+            dataTypeInfo.textContent = `${dataTypeName} Data`;
+            container.prepend(dataTypeInfo);
+        })
+        .catch(error => console.error(`Error fetching ${containerId} data:`, error));
+}
+
+    function fetchScreenshot() {
+        fetch('/udp/screenshot')
+            .then(response => response.text())
             .then(data => {
-                console.log('브라우저 콘솔 로그:', data.udpData);
-                udpDataElement.textContent = data.udpData.join(", ");
-                if (data.screenshot) {
-                    udpScreenshotElement.src = 'data:image/jpeg;base64,' + data.screenshot;
-                }
-                udpDataContainer.style.display = 'block';  // 데이터 수신 후 컨테이너를 보여줍니다.
+                const screenshotImg = document.getElementById('screenshotImg');
+                screenshotImg.src = `data:image/jpeg;base64,${data}`;
+                screenshotImg.style.display = 'inline-block';
             })
-            .catch(error => console.error('Error fetching UDP data:', error));
-    };
+            .catch(error => console.error('Error fetching screenshot:', error));
+    }
 </script>
 
 {{>layouts/footer}}
