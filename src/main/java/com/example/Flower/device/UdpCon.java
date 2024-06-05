@@ -33,7 +33,7 @@ public class UdpCon {
         datagramSocket.receive(inPacket);
 
         // 수신된 데이터 출력 및 파싱
-        System.out.println("Received Data: " + new String(inPacket.getData()));
+        System.out.println("Received Data: " + new String(inPacket.getData()).trim());
         String tmp = new String(inPacket.getData());
 
         String[] parsedData = this.parseData(tmp);
@@ -46,7 +46,7 @@ public class UdpCon {
     // 수신된 데이터를 파싱하는 메소드
     public String[] parseData(String stringData) {
         // 수신된 문자열 데이터를 쉼표로 분리하여 배열에 저장
-        String[] dataArr = stringData.split(",");
+        String[] dataArr = stringData.trim().split(",");
 
         // 데이터의 타입에 따라 다른 처리 수행
         if (dataArr[ScForm.TAG].equals(ScForm.TAGSENSOR)) {
