@@ -20,12 +20,6 @@
     </div>
 </div>
 
-
-
-
-
-
-
 <script>
     function fetchSensorData() {
         const url = '/api/udp/sensor';
@@ -60,4 +54,34 @@
             })
             .catch(error => console.error(`Error fetching ${containerId} data:`, error));
     }
+
+    //스크린샷
+    const fetchUdpDataButton = document.getElementById('fetchUdpDataButton');
+    const udpDataContainer = document.getElementById('udpDataContainer');
+    const udpScreenshotElement = document.getElementById('udpScreenshot');
+
+    fetchUdpDataButton.onclick = function() {
+        fetch('/api/start-udp')
+            .then(response => {
+                console.log('start-udp response:', response);
+                return response.json();
+            })
+            .then(data => {
+                console.log('start-udp data:', data);
+                if (data.status === 'success') {
+                    return new Promise(resolve => setTimeout(resolve, 1000))  // 1초 대기 후 데이터 요청
+                        .then(() => fetch('/api/udp-data'))
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.screenshot) {
+                                udpScreenshotElement.src = 'data:image/jpeg;base64,' + data.screenshot;
+                            }
+                            udpDataContainer.style.display = 'block';  // 데이터 수신 후 컨테이너를 보여줍니다.
+                        });
+                } else {
+                    console.error('Error starting UDP capture:', data.message);
+                }
+            })
+            .catch(error => console.error('Error fetching screenshot:', error));
+    };
 </script>
