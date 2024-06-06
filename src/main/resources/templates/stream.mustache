@@ -6,43 +6,47 @@
 <h1>UDP Streaming</h1>
 <div>
     <button onclick="fetchSensorData()">Get Sensor Data</button>
-    <button onclick="fetchActuatorData()">Get Actuator Data</button>
-    <button onclick="fetchScreenshot()">Capture Screenshot</button>
+    <div id="sensorData"></div>
+    <button onclick="fetchRotaterData()">Get Rotater Data</button>
+    <div id="rotaterData"></div>
+    <button onclick="fetchSprinklerData()">Get Sprinkler Data</button>
+    <div id="sprinklerData"></div>
+    <button onclick="fetchLedData()">Get LED Data</button>
+    <div id="ledData"></div>
+    <button id="fetchUdpDataButton">Capture Screenshot</button>
+    <div id="udpDataContainer" style="display: none;">
+        <h3>Captured Screenshot</h3>
+        <img id="udpScreenshot" alt="Screenshot not available">
+    </div>
 </div>
 
-<div id="sensorData"></div>
-<div id="actuatorData"></div>
-<img id="screenshotImg" src="" alt="Screenshot" style="display: none;">
+
+
+
+
+
 
 <script>
-    const ipAddress = "175.123.202.85";
-    const port = 20920;
-
-    // 센서 데이터 버튼 클릭
     function fetchSensorData() {
-        const url = `/udp/sensor?ipAddress=${ipAddress}&port=${port}&dataType=0`;
+        const url = '/api/udp/sensor';
         fetchAndDisplayData(url, 'sensorData', 'Sensor');
     }
 
-    // 액추에이터 데이터 버튼 클릭
-    function fetchActuatorData() {
-        const url = `/udp/actuator?ipAddress=${ipAddress}&port=${port}&dataType=1`;
-        fetchAndDisplayData(url, 'actuatorData', 'Actuator');
+    function fetchRotaterData() {
+        const url = '/api/udp/rotater';
+        fetchAndDisplayData(url, 'rotaterData', 'Rotater');
     }
 
-    // 스크린샷 캡처 버튼 클릭
-    function fetchScreenshot() {
-        fetch('/udp/screenshot')
-            .then(response => response.text())
-            .then(data => {
-                const screenshotImg = document.getElementById('screenshotImg');
-                screenshotImg.src = `data:image/jpeg;base64,${data}`;
-                screenshotImg.style.display = 'inline-block';
-            })
-            .catch(error => console.error('Error fetching screenshot:', error));
+    function fetchSprinklerData() {
+        const url = '/api/udp/sprinkler';
+        fetchAndDisplayData(url, 'sprinklerData', 'Sprinkler');
     }
 
-    // 데이터를 가져와서 화면에 표시하는 함수
+    function fetchLedData() {
+        const url = '/api/udp/led';
+        fetchAndDisplayData(url, 'ledData', 'LED');
+    }
+
     function fetchAndDisplayData(url, containerId, dataTypeName) {
         fetch(url)
             .then(response => response.json())
@@ -50,7 +54,6 @@
                 const container = document.getElementById(containerId);
                 container.textContent = JSON.stringify(data);
 
-                // 데이터 유형을 출력
                 const dataTypeInfo = document.createElement('p');
                 dataTypeInfo.textContent = `${dataTypeName} Data`;
                 container.prepend(dataTypeInfo);
@@ -58,5 +61,3 @@
             .catch(error => console.error(`Error fetching ${containerId} data:`, error));
     }
 </script>
-
-{{>layouts/footer}}
