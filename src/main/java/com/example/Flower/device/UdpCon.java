@@ -59,25 +59,28 @@ public class UdpCon {
 
     // 액추에이터 동작 메서드
     public String[] actuator(String ipAddress, int ipPort, String moterType) throws IOException, UnknownHostException {
-        DatagramSocket datagramSocket = new DatagramSocket();
-        InetAddress serverAddress = InetAddress.getByName(ipAddress);
+        DatagramSocket datagramSocket = new DatagramSocket();// UDP 소켓 생성
+        InetAddress serverAddress = InetAddress.getByName(ipAddress);// 주어진 IP 주소 문자열을 InetAddress 객체로 변환
 
-        moterType = "1," + moterType;
-        byte[] msg = moterType.getBytes();
-        byte[] rmsg = new byte[100];
+        moterType = "1," + moterType;// 액추에이터 타입을 나타내는 메시지 생성 ("1," 접두사와 함께)
+        byte[] msg = moterType.getBytes();// 메시지를 바이트 배열로 변환
+        byte[] rmsg = new byte[100]; // 응답 메시지를 저장할 바이트 배열 생성 (길이 100 바이트)
 
+        // 송신할 데이터그램 패킷 생성 (메시지 바이트 배열, 메시지 길이, 서버 주소, 포트 번호)
         DatagramPacket outPacket = new DatagramPacket(msg, msg.length, serverAddress, ipPort);
+        // 수신할 데이터그램 패킷 생성 (응답 메시지 바이트 배열, 배열 길이)
         DatagramPacket inPacket = new DatagramPacket(rmsg, rmsg.length);
 
-        datagramSocket.send(outPacket); // DatagramPacket을 전송
-        datagramSocket.receive(inPacket); // DatagramPacket을 수신
+        datagramSocket.send(outPacket);// 데이터그램 패킷을 송신
+        datagramSocket.receive(inPacket);// 데이터그램 패킷을 수신
 
+        // 수신된 데이터(바이트 배열)를 문자열로 변환하고, 앞뒤 공백을 제거
         String receivedData = new String(inPacket.getData()).trim();
         System.out.println("recvData : " + receivedData);
 
-        String[] parsedData = this.parseData(receivedData);
-        datagramSocket.close();
-        return parsedData;
+        String[] parsedData = this.parseData(receivedData);// 수신된 데이터를 파싱하여 문자열 배열로 변환
+        datagramSocket.close();// 소켓을 닫아 리소스를 해제
+        return parsedData;// 파싱된 데이터를 반환
     }
 
     //스크린샷
