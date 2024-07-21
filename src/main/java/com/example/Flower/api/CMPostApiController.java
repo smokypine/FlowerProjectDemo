@@ -45,7 +45,7 @@ public class CMPostApiController {
             String pictureBase64 = post.getPicture() != null ? Base64.getEncoder().encodeToString(post.getPicture()) : null;
             return new CMPostForm(
                     post.getId(),
-                    post.getUsers(),
+                    post.getUser(),
                     post.getTitle(),
                     post.getContent(),
                     pictureBase64,

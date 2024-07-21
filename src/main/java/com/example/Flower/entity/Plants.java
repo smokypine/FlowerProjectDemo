@@ -15,11 +15,14 @@ public class Plants {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY) //이 코드 때문에 더미 파일에 id값을 빼었다. 에러가 나기 때문.
     private Long id;
-    @Column
+
+    @Column(nullable = false)
     private String name;
+
     @Lob
     @Column(name = "YP_picture", columnDefinition="LONGBLOB")
     private byte[] YP_picture;//어린 식물 예시 사진
+
     @Lob
     @Column(name = "MP_picture", columnDefinition="LONGBLOB")
     private byte[] MP_picture;//성숙한 식물 예시 사진

@@ -18,15 +18,15 @@ public class UsersPlant {
     @GeneratedValue(strategy= GenerationType.IDENTITY) //이 코드 때문에 더미 파일에 id값을 빼었다. 에러가 나기 때문.
     private Long id;//유저 보유 식물 고유 번호
 
-    @Column
+    @Column(nullable = false) // NOT NULL 추가
     private String name;//유저 식물 이름
 
     @ManyToOne
-    @JoinColumn(name = "users_id") // 외래 키로 Users 테이블의 id를 참조
-    private Users users; // FK(유저 정보 테이블) 유저 고유 코드
+    @JoinColumn(name = "users_id", nullable = false) // 외래 키로 Users 테이블의 id를 참조
+    private User user; // FK(유저 정보 테이블) 유저 고유 코드
 
     @ManyToOne
-    @JoinColumn(name = "plants_id") // 외래 키로 Plants 테이블의 id를 참조
+    @JoinColumn(name = "plants_id", nullable = false) // 외래 키로 Plants 테이블의 id를 참조
     private Plants plants; // FK(식물 정보 테이블) 식물 고유 코드
 
     @Column
@@ -42,15 +42,15 @@ public class UsersPlant {
     @Column(name = "picture", columnDefinition="LONGBLOB")
     private byte[] picture;//식물 현재 사진
 
-    @Column
+    @Column(nullable = true)
     private int watered_count;//물을 준 횟수
 
-    @Column
+    @Column(nullable = true)
     private int fertilizered_count;//비료를 준 횟수
 
-    @Column
+    @Column(nullable = true)
     private float humidity;//습도
 
-    @Column
+    @Column(nullable = true)
     private float temperature;//온도
 }

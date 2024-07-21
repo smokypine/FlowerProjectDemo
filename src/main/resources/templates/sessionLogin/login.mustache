@@ -1,0 +1,18 @@
+{{>layouts/header}}
+
+<h1>로그인</h1>
+<br/>
+<form action="/session-login/login" method="POST">
+    <div class="mb-3">
+        <label class="form-label" for="loginId">회원 아이디</label>
+        <input type="text" class="form-control" id="loginId" name="loginId" placeholder="아이디를 입력해주세요"/>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="password">비밀번호</label>
+        <input type = "text" class="form-control" id="password" name="password" placeholder="비밀번호를 입력해주세요"/>
+    </div>
+    <button class="btn btn-success">로그인</button>
+    <a href="/session-login" class="btn btn-warning">돌아가기</a>
+</form>
+
+{{>layouts/footer}}

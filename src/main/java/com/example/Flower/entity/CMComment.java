@@ -20,7 +20,7 @@ public class CMComment {//커뮤니티 게시글 테이블
     
     @ManyToOne
     @JoinColumn(name = "users_id") // 외래 키로 Users 테이블의 id를 참조
-    private Users users; // FK(유저 정보 테이블) 유저 고유 코드
+    private User user; // FK(유저 정보 테이블) 유저 고유 코드
 
     @ManyToOne
     @JoinColumn(name = "cmPost_id") // 외래 키로 CMPost 테이블의 id를 참조

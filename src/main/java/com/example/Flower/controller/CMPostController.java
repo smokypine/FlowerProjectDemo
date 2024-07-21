@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/posts")
-public class CMPostController extends SessionController{
+public class CMPostController extends SessionCheckController{
 
     @Autowired
     private CMPostService cmPostService;
@@ -53,7 +53,7 @@ public class CMPostController extends SessionController{
             String pictureBase64 = post.getPicture() != null ? Base64.getEncoder().encodeToString(post.getPicture()) : null;
             return new CMPostForm(
                     post.getId(),
-                    post.getUsers(),
+                    post.getUser(),
                     post.getTitle(),
                     post.getContent(),
                     pictureBase64,

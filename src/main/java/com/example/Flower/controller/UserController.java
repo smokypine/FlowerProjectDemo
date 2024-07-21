@@ -1,9 +1,11 @@
 /* UserController.java */
 package com.example.Flower.controller;
 
-import com.example.Flower.dto.UsersForm;
-import com.example.Flower.entity.Users;
-import com.example.Flower.repository.UsersRepository;
+import com.example.Flower.dto.UserForm;
+import com.example.Flower.entity.UserRole;
+import com.example.Flower.entity.User;
+import com.example.Flower.repository.UserRepository;
+import com.example.Flower.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -14,84 +16,73 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Controller
-public class UserController extends SessionController{
+public class UserController extends SessionCheckController {
 
     @Autowired
-    private UsersRepository usersRepository;
+    private UserService userService; // UserService 의존성 주입
 
-    @GetMapping("/users/new")
+    @ModelAttribute
+    public void addAttributes(Model model, @SessionAttribute(name="userId", required=false) Long userId) {
+        // 로그인된 사용자의 닉네임을 모델에 추가
+        if (userId != null) {
+            User loginUser = userService.getLoginUserById(userId);
+            if (loginUser != null) {
+                model.addAttribute("nickname", loginUser.getNickname());
+            }
+        }
+    }
+
+    @ModelAttribute
+    public void adminUserCheck(Model model, @SessionAttribute(name="userId", required=false) Long userId) {
+        // 로그인된 사용자가 관리자(admin)인지 여부를 모델에 추가
+        if (userId != null) {
+            User loginUser = userService.getLoginUserById(userId);
+            if (loginUser != null) {
+                model.addAttribute("nickname", loginUser.getNickname());
+                model.addAttribute("isAdmin", loginUser.getRole().equals(UserRole.ADMIN));
+            }
+        }
+    }
+
+    @GetMapping("/user/new")
     public String newUserForm() {
+        // 새 사용자 폼 페이지로 이동
         return "users/new";
     }
 
-    @PostMapping("/users/create")
-    public String createUser(UsersForm form) {
-        log.info(form.toString());
-        Users user = form.toEntity();
-        log.info(user.toString());
-        Users saved = usersRepository.save(user);
-        log.info(saved.toString());
-        return "redirect:/users/" + saved.getId();
-    }
-
-    @GetMapping("/users")
+    @GetMapping("/user")
     public String userIndex(Model model) {
-        List<Users> userEntityList = usersRepository.findAll();
+        // 모든 사용자 목록을 모델에 추가하고 사용자 인덱스 페이지로 이동
+        List<User> userEntityList = userService.findAllUsers();
         model.addAttribute("userList", userEntityList);
         return "users/index";
     }
 
-    @GetMapping("/users/{id}/edit")
+    @GetMapping("/user/{id}/edit")
     public String editUser(@PathVariable Long id, Model model) {
-        Users userEntity = usersRepository.findById(id).orElse(null);
-        if (userEntity != null) {
-            model.addAttribute("user", userEntity);
-            model.addAttribute("isAdmin", userEntity.getClasses() == 0);
-            model.addAttribute("isUser", userEntity.getClasses() == 1);
-        }
+        // 특정 사용자를 편집할 수 있는 페이지로 이동
+        User userEntity = userService.findUserById(id);
+        model.addAttribute("user", userEntity);
         return "users/edit";
     }
 
-    @PostMapping("/users/update")
-    public String updateUser(@ModelAttribute UsersForm form) {
-        Users userEntity = form.toEntity();
-        Users target = usersRepository.findById(userEntity.getId()).orElse(null);
-        if (target != null) {
-            target.setUserId(userEntity.getUserId());
-            target.setPassword(userEntity.getPassword());
-            target.setName(userEntity.getName());
-            target.setAge(userEntity.getAge());
-            target.setPhoneNumber(userEntity.getPhoneNumber());
-            target.setEmail(userEntity.getEmail());
-            target.setClasses(userEntity.getClasses());
-            usersRepository.save(target);
-        }
-        return "redirect:/users/" + userEntity.getId();
-    }
-
-    @GetMapping("/users/{id}")
+    @GetMapping("/user/{id}")
     public String showUser(@PathVariable("id") Long id, Model model) {
+        // 특정 사용자의 상세 정보를 보여주는 페이지로 이동
         log.info("id = " + id);
-        Users userEntity = usersRepository.findById(id).orElse(null);
+        User userEntity = userService.findUserById(id);
         model.addAttribute("user", userEntity);
         return "users/show";
     }
 
-    @GetMapping("/users/{id}/delete")
+    @GetMapping("/user/{id}/delete")
     public String deleteUser(@PathVariable Long id, RedirectAttributes rttr) {
-        Users target = usersRepository.findById(id).orElse(null);
-        if (target != null) {
-            usersRepository.delete(target);
-            rttr.addFlashAttribute("msg", "삭제됐습니다!");
-        }
-        return "redirect:/users";
+        // 특정 사용자를 삭제하고 사용자 인덱스 페이지로 리다이렉트
+        userService.deleteUser(id);
+        rttr.addFlashAttribute("msg", "삭제됐습니다!");
+        return "redirect:/user";
     }
-
-    @Autowired
-    private HttpServletRequest request;
-
 }

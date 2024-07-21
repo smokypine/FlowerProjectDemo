@@ -1,7 +1,7 @@
 package com.example.Flower.dto;
 
 import com.example.Flower.entity.CMPost;
-import com.example.Flower.entity.Users;
+import com.example.Flower.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Setter
 public class CMPostForm {
     private Long id;
-    private Users usersId; // 외래 키로 참조하는 Users 엔티티의 id
+    private User userId; // 외래 키로 참조하는 Users 엔티티의 id
     private String title; // 글 제목
     private String content; // 글 내용
     private MultipartFile picture; // 게시글에 올린 사진
@@ -25,9 +25,9 @@ public class CMPostForm {
     private LocalDateTime regdate; // 글 작성 시간
     private int count; // 조회수
 
-    public CMPostForm(Long id, Users usersId, String title, String content, String pictureBase64, int likeCount, LocalDateTime regdate, int count) {
+    public CMPostForm(Long id, User userId, String title, String content, String pictureBase64, int likeCount, LocalDateTime regdate, int count) {
         this.id = id;
-        this.usersId = usersId;
+        this.userId = userId;
         this.title = title;
         this.content = content;
         this.pictureBase64 = pictureBase64;
@@ -37,6 +37,6 @@ public class CMPostForm {
     }
 
     public CMPost toEntity(byte[] pictureBytes) {
-        return new CMPost(id, usersId, title, content, pictureBytes, likeCount, regdate, count);
+        return new CMPost(id, userId, title, content, pictureBytes, likeCount, regdate, count);
     }
 }

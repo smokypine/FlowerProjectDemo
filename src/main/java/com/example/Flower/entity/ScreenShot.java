@@ -11,7 +11,7 @@ public class ScreenShot {
     private Long id;
 
     @Lob
-    @Column(nullable = false, columnDefinition = "LONGBLOB")
+    @Column(nullable = false, columnDefinition = "LONGBLOB")//not null
     private byte[] image;
 
     @Column(nullable = false)

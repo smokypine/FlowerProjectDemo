@@ -18,16 +18,16 @@ public class Diary {
     @GeneratedValue(strategy= GenerationType.IDENTITY) //이 코드 때문에 더미 파일에 id값을 빼었다. 에러가 나기 때문.
     private Long id;//유저 보유 식물 고유 번호
 
-    @Column(name = "USERNAME")
+    @Column(name = "USERNAME", nullable = false)
     private String userName;
 
-    @Column
+    @Column(nullable = false)//제목을 적어야 하므로 not null
     private String title;
 
-    @Column(name = "content", nullable = true)
+    @Column(name = "content", nullable = false)//글 내용을 적어야 하니 not null
     private String content;
 
-    @Column(name = "picture", columnDefinition="LONGBLOB", nullable = true)
+    @Column(name = "picture", columnDefinition="LONGBLOB", nullable = true)//사진을 안 올렸을 수 있으니 null 허용으로
     private byte[] picture;//게시글에 올린 사진
 
     @Column

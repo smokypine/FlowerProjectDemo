@@ -3,7 +3,7 @@ package com.example.Flower.dto;
 
 import com.example.Flower.entity.CMComment;
 import com.example.Flower.entity.CMPost;
-import com.example.Flower.entity.Users;
+import com.example.Flower.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @ToString
 public class CMCommentForm {
     private Long id;
-    private Users usersId; // 외래 키로 참조하는 Users 엔티티의 id
+    private User userId; // 외래 키로 참조하는 Users 엔티티의 id
     private CMPost cmPostId; // 외래 키로 참조하는 CMPost 엔티티의 id
     private String title; // 글 제목
     private String content; // 글 내용
@@ -22,7 +22,7 @@ public class CMCommentForm {
 
     public CMComment toEntity() {
 
-        return new CMComment(id,usersId,cmPostId, title, content, likeCount, regdate);
+        return new CMComment(id, userId,cmPostId, title, content, likeCount, regdate);
     }
 
 }
