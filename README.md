@@ -11,3 +11,45 @@ MySql 연동 상태. 다만 이 점을 지켜줄 것.
 <p>drop schema if exists flower;</p>
 <p>create schema flower;</p>
 <p>use flower;</p>
+
+
+<h3> 7월 21일 업데이트된 목록</h3>
+<h4>entity 폴더</h4>
+<p>User</p>
+<p>UserRole</p>
+<br>
+<h4>dto 폴더</h4>
+<p>UserForm</p>
+<br>
+<h4>controller 폴더</h4>
+<p>SessionCheckController <- 로그인 한 아이디 체크, 로그인 한 아이디가 관리자 여부인가를 체크</p>
+<p>SessionLoginController <- 세션 로그인 및 로그아웃 처리</p>
+<p>UserController <- 회원가입, 관리자 페이지의 사용자 생성/수정/삭제</p>
+<br>
+<h4>api 폴더</h4>
+<p>UserApiController <- REST API 관련으로 회원가입, 관리자 페이지 사용자 생성/수정/삭제 사용자 아이디 중복체크, 사용자 닉네임 중복체크</p>
+<br>
+<h4>service 폴더</h4>
+<p>UserService</p>
+<br>
+<h4>resource 폴더의 sessionLogin 폴더와 users 폴더</h4>
+<h4>sessionLogin</h4>
+<p>join.mustache <- 회원가입 코드. UserApiController의 </p>
+    //회원가입할 때
+    @PostMapping("/join")
+    public User joinUser(@RequestBody UserForm form) {
+        // 회원가입
+        log.info(form.toString());
+        User user = form.toEntity();
+        log.info(user.toString());
+        return userService.saveUser(user);
+    }
+    <p>와 UserService의</p>
+        @Transactional
+    public User saveUser(User user) {
+        // 새로운 사용자를 저장
+        return userRepository.save(user);
+    }
+    <p>이 부분이 연관됨.</p>
+
+
