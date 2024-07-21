@@ -11,7 +11,7 @@ MySql 연동 상태. 다만 이 점을 지켜줄 것.
 <p>drop schema if exists flower;</p>
 <p>create schema flower;</p>
 <p>use flower;</p>
-
+<br><br>
 
 <h3> 7월 21일 업데이트된 목록</h3>
 <h4>entity 폴더</h4>
@@ -35,11 +35,7 @@ MySql 연동 상태. 다만 이 점을 지켜줄 것.
 <h4>resource 폴더의 sessionLogin 폴더와 users 폴더</h4>
 <h4>sessionLogin 폴더의</h4>
 <p>join.mustache <- 회원가입 코드. UserApiController의</p> 
-    <p>@PostMapping("/join") public User joinUser(@RequestBody UserForm form) {...}</p>
-<p>과 UserService의</p>
-        <p>@Transactional public User saveUser(User user) {...}</p>
-<p>이 부분이 연관됨.</p>
-<br>
+    <p>@PostMapping("/join") public User joinUser(@RequestBody UserForm form) {...} 과 UserService의 @Transactional public User saveUser(User user) {...} 가 각각 연관됨.</p>
 <h4>users 폴더의</h4>
 <p>edit, index 또한 UserService와 UserApiController과 연관되어 있음.</p>
 
