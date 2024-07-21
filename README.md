@@ -35,19 +35,9 @@ MySql 연동 상태. 다만 이 점을 지켜줄 것.
 <h4>resource 폴더의 sessionLogin 폴더와 users 폴더</h4>
 <h4>sessionLogin</h4>
 <p>join.mustache <- 회원가입 코드. UserApiController의</p> 
-    <p>//회원가입할 때</p>
-    <p>@PostMapping("/join")</p>
-    <p>public User joinUser(@RequestBody UserForm form) {</p>
-        <p>// 회원가입</p>
-        <p>log.info(form.toString());</p>
-        <p>User user = form.toEntity();</p>
-        <p>log.info(user.toString());</p>
-        <p>return userService.saveUser(user);}</p>
-    <p>와 UserService의</p>
-        <p>@Transactional</p>
-    <p>public User saveUser(User user) {</p>
-        <p>// 새로운 사용자를 저장</p>
-        <p>return userRepository.save(user);}</p>
-    <p>이 부분이 연관됨.</p>
+    <p>@PostMapping("/join") public User joinUser(@RequestBody UserForm form) {...}</p>
+<p>과 UserService의</p>
+        <p>@Transactional public User saveUser(User user) {...}</p>
+<p>이 부분이 연관됨.</p>
 
 
