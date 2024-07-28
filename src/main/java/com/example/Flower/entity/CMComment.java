@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @ToString
 @Entity
-public class CMComment {//커뮤니티 게시글 테이블
+public class CMComment {//커뮤니티 게시글 댓글 테이블
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY) //이 코드 때문에 더미 파일에 id값을 빼었다. 에러가 나기 때문.
     private Long id;
@@ -27,13 +27,13 @@ public class CMComment {//커뮤니티 게시글 테이블
     private CMPost cmPost; // FK(유저 정보 테이블) 유저 고유 코드
     
     @Column
-    private String title;//글 제목
+    private String title;//댓글 제목
 
     @Column(name = "content")
     private String content;
 
     @Column
-    private int like_count;//추천 개수
+    private int likeCount;//추천 개수
 
     @Column
     private LocalDateTime regdate;//일기 작성 시간

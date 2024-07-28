@@ -37,7 +37,7 @@ public class CMPost {//커뮤니티 게시글 테이블
     private int likeCount;//추천 개수
 
     @Column
-    private LocalDateTime regdate;//일기 작성 시간
+    private LocalDateTime regdate;//게시글 작성 시간
 
     @PrePersist
     protected void onCreate() {
@@ -45,7 +45,7 @@ public class CMPost {//커뮤니티 게시글 테이블
     }
 
     @Column
-    private int count;//추천 개수
+    private int count;//조회수
 
 }
 
