@@ -31,25 +31,48 @@ public class UserService {
     }
 
      //로그인 처리 메서드
-    public User login(LoginRequest req) {
-        Optional<User> optionalUser = userRepository.findByLoginId(req.getLoginId()); // 로그인 ID로 사용자 조회
-        if (optionalUser.isEmpty()) {
-            return null; // 사용자가 존재하지 않으면 null 반환
-        }
-        User user = optionalUser.get();
-        if (!user.getPassword().equals(req.getPassword())) {
-            return null; // 비밀번호가 일치하지 않으면 null 반환
-        }
-        return user; // 로그인 성공 시 User 객체 반환
-    }
+     public User login(LoginRequest req) {
+         Optional<User> optionalUser = userRepository.findByLoginId(req.getLoginId()); // 로그인 ID로 사용자 조회
+         if (optionalUser.isEmpty()) {
+             return null; // 사용자가 존재하지 않으면 null 반환
+         }
+
+         User user = optionalUser.get();
+
+         // 계정이 비활성화 상태인지 확인
+         if (user.getActive() == 0) {
+             log.info("User account is deactivated: " + user.getLoginId());
+             return null; // 계정이 비활성화 상태이면 null 반환
+         }
+
+         if (!user.getPassword().equals(req.getPassword())) {
+             return null; // 비밀번호가 일치하지 않으면 null 반환
+         }
+
+         return user; // 로그인 성공 시 User 객체 반환
+     }
+
     //회원 가입 메서드
     public void join(JoinRequest req) {
         userRepository.save(req.toEntity()); // JoinRequest 객체를 엔티티로 변환하여 저장
     }
 
+    //기존의 사용자 목록 조회
+//    public List<User> findAllUsers() {
+//        // 모든 사용자 목록을 조회
+//        return (List<User>) userRepository.findAll();
+//    }
+
+    //활성화된 사용자만 조회
     public List<User> findAllUsers() {
-        // 모든 사용자 목록을 조회
-        return (List<User>) userRepository.findAll();
+        return userRepository.findAllActiveUsers();
+    }
+
+    //비활성화된 사용자만 조회
+    @Transactional
+    public List<User> findInactiveUsers() {
+        // 활성화 상태(active가 0인) 사용자를 조회
+        return userRepository.findByActive(0);
     }
 
     public User findUserById(Long id) {
@@ -85,14 +108,38 @@ public class UserService {
     }
 
     //사용자 삭제
+//    @Transactional
+//    public void deleteUser(Long id) {
+//        // 특정 ID의 사용자를 삭제
+//        User target = userRepository.findById(id).orElse(null);
+//        if (target != null) {
+//            userRepository.delete(target);
+//        }
+//    }
+
+    //사용자 비활성화
     @Transactional
-    public void deleteUser(Long id) {
-        // 특정 ID의 사용자를 삭제
+    public void deactivateUser(Long id) {
         User target = userRepository.findById(id).orElse(null);
         if (target != null) {
-            userRepository.delete(target);
+            target.setActive(0); // 비활성화
+            userRepository.save(target); // 변경된 사용자 정보를 저장
         }
     }
+
+    //사용자 활성화
+    @Transactional
+    public User activateUser(Long id) {
+        // 특정 ID의 사용자 정보를 조회
+        User userEntity = userRepository.findById(id).orElse(null);
+        if (userEntity != null && userEntity.getActive() == 0) {
+            // 사용자가 비활성화 상태일 때만 활성화
+            userEntity.setActive(1);
+            return userRepository.save(userEntity); // 사용자 정보를 업데이트하여 저장
+        }
+        return null; // 사용자가 없거나 이미 활성화된 상태일 경우 null 반환
+    }
+
     //중복 아이디 체크
     public boolean isLoginIdDuplicate(String loginId) {
         return userRepository.findByLoginId(loginId).isPresent();

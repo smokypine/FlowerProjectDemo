@@ -1,23 +1,30 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Post List</title>
-</head>
-<body>
-<h1>Post List</h1>
-<ul>
-    {{#posts}}
-        <li>
-            <h2>{{title}}</h2>
-            <p>{{content}}</p>
-            {{#pictureBase64}}
-                <img src="data:image/jpeg;base64,{{pictureBase64}}" alt="Post Image"/>
-            {{/pictureBase64}}
-            <p>Likes: {{likeCount}}</p>
-            <p>Views: {{count}}</p>
-            <p>Posted on: {{regdate}}</p>
-        </li>
-    {{/posts}}
+{{> layouts/header}}
+
+<h1>게시글 목록</h1>
+<ul id="postList">
+    <!-- 게시글 목록이 여기에서 동적으로 삽입됩니다. -->
 </ul>
-</body>
-</html>
+
+{{> layouts/footer}}
+
+<script>
+    // 페이지 로드 시 게시글 목록을 불러오기
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/posts')
+            .then(response => response.json())
+            .then(posts => {
+                const postList = document.getElementById('postList');
+                posts.forEach(post => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <a href="/posts/${post.id}"><h2>${post.title}</h2></a>
+                        <p>작성자: ${post.user.nickname}</p>
+                        <p>좋아요: ${post.likeCount}</p>
+                        <p>조회수: ${post.count}</p>
+                        <p>작성 시간: ${post.regdate}</p>
+                    `;
+                    postList.appendChild(listItem);
+                });
+            });
+    });
+</script>

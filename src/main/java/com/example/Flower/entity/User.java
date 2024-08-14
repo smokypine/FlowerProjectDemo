@@ -30,6 +30,7 @@ public class User {
     private String phonenumber;
     private String email;
     private UserRole role;
+    private int active; //회원 활성화, 비활성화. 1이면 활성화. 0이면 비활성화.
 
 }
 

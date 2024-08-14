@@ -5,24 +5,28 @@ import com.example.Flower.entity.CMComment;
 import com.example.Flower.entity.CMPost;
 import com.example.Flower.entity.User;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
-@ToString
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString(exclude = "cmPostId") // cmPostId 필드를 toString()에서 제외하여 순환 참조를 피함
 public class CMCommentForm {
-    private Long id;
-    private User userId; // 외래 키로 참조하는 Users 엔티티의 id
-    private CMPost cmPostId; // 외래 키로 참조하는 CMPost 엔티티의 id
-    private String title; // 글 제목
-    private String content; // 글 내용
-    private int likeCount; // 추천 개수
-    private LocalDateTime regdate; // 글 작성 시간
+    private Long id; // 댓글 ID
+    private CMPost cmPostId; // 게시글 ID
+    private User userId; // 사용자 ID
+    private String content; // 댓글 내용
+    private int likeCount; // 댓글 좋아요
+    private LocalDateTime regdate; // 작성 시간
 
+    // 엔티티로 변환하는 메서드
     public CMComment toEntity() {
-
-        return new CMComment(id, userId,cmPostId, title, content, likeCount, regdate);
+        return new CMComment(id, userId, cmPostId, content, likeCount, regdate);
     }
-
 }

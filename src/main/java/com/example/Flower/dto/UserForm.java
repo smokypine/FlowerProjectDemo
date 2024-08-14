@@ -19,6 +19,7 @@ public class UserForm {
     private String phonenumber;
     private String email;
     private UserRole role; // role 필드 추가
+    private int active;
 
     public User toEntity() {
         return User.builder()
@@ -31,7 +32,7 @@ public class UserForm {
                 .phonenumber(this.phonenumber)
                 .email(this.email)
                 .role(this.role != null ? this.role : UserRole.USER) // 기본값 설정
+                .active(1)
                 .build();
     }
-
 }
