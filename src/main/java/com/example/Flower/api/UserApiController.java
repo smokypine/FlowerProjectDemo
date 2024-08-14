@@ -2,7 +2,11 @@ package com.example.Flower.api;
 
 import com.example.Flower.dto.JoinRequest;
 import com.example.Flower.dto.UserForm;
+import com.example.Flower.entity.CMComment;
+import com.example.Flower.entity.CMPost;
 import com.example.Flower.entity.User;
+import com.example.Flower.service.CMCommentService;
+import com.example.Flower.service.CMPostService;
 import com.example.Flower.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;

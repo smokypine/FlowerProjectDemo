@@ -35,6 +35,7 @@ public class JoinRequest {
                 .email(this.email)
                 //추가
                 .role(UserRole.USER)
+                .active(1)
                 .build();
     }
 

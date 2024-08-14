@@ -1,5 +1,8 @@
 {{>layouts/header}}
-
-<h1>main 페이지</h1>
-
+<h2>공지사항</h2>
+{{>announces/homeannounceindex}} <!-- homeannounceindex.mustache를 포함시킴 -->
+<br>
+<h2>자유게시판</h2>
+{{> cmPost/homepostList}} <!-- homepostList.mustache를 포함시킴 -->
+<br>
 {{>layouts/footer}}

@@ -1,5 +1,6 @@
 package com.example.Flower.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,6 +9,8 @@ import lombok.*;
 @Builder
 @Getter
 @Setter
+//@ToString(exclude = "user") // users 필드를 toString()에서 제외하여 순환 참조를 피함
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Hibernate 프록시 속성 무시
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -30,6 +33,7 @@ public class User {
     private String phonenumber;
     private String email;
     private UserRole role;
+    private int active; //회원 활성화, 비활성화. 1이면 활성화. 0이면 비활성화.
 
 }
 

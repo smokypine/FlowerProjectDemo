@@ -2,9 +2,13 @@
 package com.example.Flower.controller;
 
 import com.example.Flower.dto.UserForm;
+import com.example.Flower.entity.CMComment;
+import com.example.Flower.entity.CMPost;
 import com.example.Flower.entity.UserRole;
 import com.example.Flower.entity.User;
 import com.example.Flower.repository.UserRepository;
+import com.example.Flower.service.CMCommentService;
+import com.example.Flower.service.CMPostService;
 import com.example.Flower.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -61,6 +65,15 @@ public class UserController extends SessionCheckController {
         return "users/index";
     }
 
+    //비활성화된 사용자 목록 확인하기
+    @GetMapping("/user/inactive")
+    public String inactiveUserIndex(Model model) {
+        // 비활성화된 사용자 목록을 모델에 추가하고 해당 페이지로 이동
+        List<User> inactiveUserList = userService.findInactiveUsers();
+        model.addAttribute("inactiveUserList", inactiveUserList);
+        return "users/inactive_index";
+    }
+
     @GetMapping("/user/{id}/edit")
     public String editUser(@PathVariable Long id, Model model) {
         // 특정 사용자를 편집할 수 있는 페이지로 이동
@@ -75,14 +88,37 @@ public class UserController extends SessionCheckController {
         log.info("id = " + id);
         User userEntity = userService.findUserById(id);
         model.addAttribute("user", userEntity);
-        return "users/show";
+
+        // 사용자 활성화 상태에 따라 다른 페이지로 이동
+        if (userEntity.getActive() == 1) {
+            return "users/show"; // 활성화된 사용자 상세 페이지
+        } else {
+            return "users/inactive_show"; // 비활성화된 사용자 상세 페이지
+        }
+        //return "users/show";
     }
 
+    //사용자 계정 삭제(비활성화)
     @GetMapping("/user/{id}/delete")
     public String deleteUser(@PathVariable Long id, RedirectAttributes rttr) {
-        // 특정 사용자를 삭제하고 사용자 인덱스 페이지로 리다이렉트
-        userService.deleteUser(id);
-        rttr.addFlashAttribute("msg", "삭제됐습니다!");
+        userService.deactivateUser(id); // 비활성화 메서드를 호출
+        rttr.addFlashAttribute("msg", "계정이 삭제되었습니다!");//실제로는 비활성화
         return "redirect:/user";
     }
+
+    //사용자 계정 되살리기(활성화)
+    @GetMapping("/user/{id}/activate")
+    public String activateUser(@PathVariable Long id, RedirectAttributes rttr) {
+        User user = userService.activateUser(id);
+        if (user != null) {
+            rttr.addFlashAttribute("msg", "계정을 되살렸습니다!");
+        } else {
+            rttr.addFlashAttribute("msg", "계정을 되살릴 수 없습니다.");
+        }
+        return "redirect:/user";
+    }
+
+    //사용자의 방명록으로 이동
+
+
 }
