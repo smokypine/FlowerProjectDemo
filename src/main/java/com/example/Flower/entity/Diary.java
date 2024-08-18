@@ -1,39 +1,58 @@
 package com.example.Flower.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString
+@Setter
+@Builder
+@ToString(exclude = "user") // users 필드를 toString()에서 제외하여 순환 참조를 피함
 @Entity
 public class Diary {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY) //이 코드 때문에 더미 파일에 id값을 빼었다. 에러가 나기 때문.
-    private Long id;//다이어리 고유 코드
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; // 게시글 고유 번호
 
-    @Column(name = "USERNAME", nullable = false)
-    private String userName;
-
-    @Column(nullable = false)//제목을 적어야 하므로 not null
-    private String title;
-
-    @Column(name = "content", nullable = true)//글 내용을 적지 않고 올릴 수 있으니 nullable
-    private String content;
-
-    @Column(name = "picture", columnDefinition="LONGBLOB", nullable = true)//사진을 안 올렸을 수 있으니 null 허용으로
-    private byte[] picture;//게시글에 올린 사진
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user; // 유저 정보 가져오기
 
     @Column
-    private LocalDateTime regdate;//일기 작성 시간
+    private String title; // 게시글 제목
+
+    @Column(name = "content", nullable = true) // "content"라는 이름의 열을 정의하고 null 값을 허용
+    private String content; // 게시글 내용
+
+    @ElementCollection
+    @Column(name = "pictures", columnDefinition = "LONGBLOB") // "pictures"라는 이름의 열을 정의하고 데이터 타입을 LONGBLOB으로 설정
+    private List<byte[]> pictures; // 사진 리스트
+
+    @Column(name = "like_count")
+    private int likeCount; // 좋아요 갯수
+
+    @Column
+    private LocalDateTime regdate; // 글 작성시간
+
     @PrePersist
     protected void onCreate() {
-        this.regdate = LocalDateTime.now();
+        this.regdate = LocalDateTime.now(); // 현재 시간을 regdate에 설정
+    }
+
+    @Column
+    private int count; // 조회수
+
+    // 조회수 증가 메서드
+    public void incrementCount() {
+        this.count++;
+    }
+
+    // 좋아요 수 증가 메서드
+    public void incrementLikeCount() {
+        this.likeCount++;
     }
 }

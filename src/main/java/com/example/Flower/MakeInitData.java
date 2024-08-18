@@ -208,4 +208,5 @@ public class MakeInitData {
                 .build();
         announceRepository.save(announce5);
     }
+
 }

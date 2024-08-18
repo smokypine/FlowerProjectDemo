@@ -6,9 +6,11 @@ import com.example.Flower.dto.LoginRequest;
 import com.example.Flower.dto.UserForm;
 import com.example.Flower.entity.CMComment;
 import com.example.Flower.entity.CMRecomment;
+import com.example.Flower.entity.Friend;
 import com.example.Flower.entity.User;
 import com.example.Flower.repository.CMCommentRepository;
 import com.example.Flower.repository.CMRecommentRepository;
+import com.example.Flower.repository.FriendRepository;
 import com.example.Flower.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -191,6 +194,53 @@ public class UserService {
         return responses.stream()
                 .sorted((r1, r2) -> r2.getRegdate().compareTo(r1.getRegdate()))
                 .collect(Collectors.toList());
+    }
+    @Autowired
+    private FriendRepository friendRepository;
+
+    //사용자와 친구 데이터를 미리 로드하여 컨트롤러로 전달
+    @Transactional
+    public User findUserWithFriends(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        // friends를 초기화하여 지연 로딩을 방지
+        user.getFriends().size();
+        return user;
+    }
+
+    public void addFriend(Long userId, Long friendId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        User friend = userRepository.findById(friendId)
+                .orElseThrow(() -> new RuntimeException("Friend not found"));
+
+        // 이미 친구인지 확인
+        if (friendRepository.existsByUserAndFriend(user, friend)) {
+            throw new RuntimeException("Already friends");
+        }
+
+        // 친구 추가
+        Friend newFriend = new Friend();
+        newFriend.setUser(user); // 로그인한 사용자
+        newFriend.setFriend(friend); // 추가할 친구
+        friendRepository.save(newFriend);
+    }
+
+    public void removeFriend(Long userId, Long friendId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        User friend = userRepository.findById(friendId)
+                .orElseThrow(() -> new RuntimeException("Friend not found"));
+
+        // 친구 삭제
+        Optional<Friend> existingFriendOpt = Optional.ofNullable(friendRepository.findByUserAndFriend(user, friend));
+        if (!existingFriendOpt.isPresent()) {
+            throw new RuntimeException("Friend relationship not found");
+        }
+
+        friendRepository.delete(existingFriendOpt.get());
     }
 
 }
