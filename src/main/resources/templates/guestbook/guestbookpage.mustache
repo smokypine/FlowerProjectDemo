@@ -1,0 +1,58 @@
+{{> layouts/header}}
+
+<h1 id="userName"></h1>
+
+<h2>작성한 게시글</h2>
+<ul id="userPosts"></ul>
+
+<h2>작성한 댓글</h2>
+<ul id="userComments"></ul>
+
+{{> layouts/footer}}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var userId = new URLSearchParams(window.location.search).get('userId');
+
+        // 사용자 정보 불러오기
+        fetch('/api/users/' + userId)
+            .then(response => response.json())
+            .then(user => {
+                document.getElementById('userName').textContent = user.nickname;
+            });
+
+        // 사용자가 작성한 게시글 불러오기
+        fetch('/api/users/' + userId + '/posts')
+            .then(response => response.json())
+            .then(posts => {
+                const userPosts = document.getElementById('userPosts');
+                posts.forEach(post => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <a href="/posts/${post.id}"><h3>${post.title}</h3></a>
+                        <p>좋아요: ${post.likeCount}</p>
+                        <p>조회수: ${post.count}</p>
+                        <p>작성 시간: ${post.regdate}</p>
+                    `;
+                    userPosts.appendChild(listItem);
+                });
+            });
+
+        // 사용자가 작성한 댓글 불러오기
+        fetch('/api/users/' + userId + '/comments')
+            .then(response => response.json())
+            .then(comments => {
+                const userComments = document.getElementById('userComments');
+                comments.forEach(comment => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <p><a href="/posts/${comment.cmPost.id}">게시글 ID: ${comment.cmPost.id}</a></p>
+                        <p>${comment.content}</p>
+                        <p>좋아요: ${comment.likeCount}</p>
+                        <p>작성 시간: ${comment.regdate}</p>
+                    `;
+                    userComments.appendChild(listItem);
+                });
+            });
+    });
+</script>
