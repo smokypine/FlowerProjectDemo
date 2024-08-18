@@ -2,19 +2,20 @@ package com.example.Flower.api;
 
 import com.example.Flower.controller.SessionCheckController;
 import com.example.Flower.dto.CMRecommentForm;
-import com.example.Flower.entity.CMComment;
+import com.example.Flower.entity.CMPost;
 import com.example.Flower.entity.CMRecomment;
+import com.example.Flower.entity.CMComment;
 import com.example.Flower.entity.User;
-import com.example.Flower.service.CMCommentService;
 import com.example.Flower.service.CMRecommentService;
+import com.example.Flower.service.CMCommentService;
 import com.example.Flower.service.UserService;
-import jakarta.servlet.http.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
@@ -47,10 +48,12 @@ public class CMRecommentApiController extends SessionCheckController {
         logger.info("Logged in user: {}", loginUser.getNickname()); // 로그인된 사용자 정보 로그 출력
 
         CMComment comment = cmCommentService.findCommentById(form.getCmCommentId().getId()); // 댓글 ID로 댓글 조회
+        CMPost post = comment.getCmPost(); // 댓글에서 게시글 가져오기
 
-        if (comment != null) {
+        if (comment != null && post != null) {
             CMRecomment recomment = new CMRecomment(); // 새로운 대댓글 생성
             recomment.setCmComment(comment); // 대댓글에 댓글 설정
+            recomment.setCmPost(post); // 대댓글에 게시글 설정
             recomment.setContent(form.getContent()); // 대댓글 내용 설정
             recomment.setLikeCount(0); // 기본 좋아요 수 0으로 설정
             recomment.setUser(loginUser); // 대댓글 작성자 설정
@@ -60,8 +63,9 @@ public class CMRecommentApiController extends SessionCheckController {
             return ResponseEntity.ok("Recomment created successfully"); // 성공 응답 반환
         }
 
-        return ResponseEntity.badRequest().body("Comment not found"); // 댓글을 찾을 수 없는 경우 오류 응답 반환
+        return ResponseEntity.badRequest().body("Comment or Post not found"); // 댓글이나 게시글을 찾을 수 없는 경우 오류 응답 반환
     }
+
 
     @GetMapping("/comment/{commentId}") // GET 요청을 "/comment/{commentId}" 경로와 매핑
     public ResponseEntity<List<CMRecomment>> listRecomments(@PathVariable Long commentId) {

@@ -1,7 +1,11 @@
 package com.example.Flower.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -9,20 +13,25 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"cmComment", "user"}) // cmComment, users 필드를 toString()에서 제외하여 순환 참조를 피함
 @Entity
 public class CMRecomment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 대댓글 고유번호
 
-    @ManyToOne
-    @JoinColumn(name = "cmComment_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cm_comment_id")
+    @JsonBackReference // 순환 참조 방지
     private CMComment cmComment; // 댓글 정보 가져오기
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user; // 유저 정보 가져오기
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cm_post_id", nullable = false) // cm_post_id로 외래키 설정
+    @JsonBackReference // 순환 참조 방지
+    private CMPost cmPost; // 게시글 정보 가져오기
 
     @Column
     private String content; // 대댓글 내용

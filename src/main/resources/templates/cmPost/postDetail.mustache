@@ -30,7 +30,7 @@
             .then(response => response.json())
             .then(post => {
                 document.getElementById('postTitle').textContent = post.title;
-                document.getElementById('postAuthor').innerHTML = '작성자: <a href="/guestbook/guestbookpage?userId=' + post.user.id + '">' + post.user.nickname + '</a>';
+                document.getElementById('postAuthor').innerHTML = '작성자: <a href="/user/' + post.user.id + '/guestbook">' + post.user.nickname + '</a>';
                 document.getElementById('postContent').textContent = post.content;
                 document.getElementById('postLikeCount').textContent = '좋아요 갯수: ' + post.likeCount;
                 document.getElementById('postCount').textContent = '조회수: ' + post.count;
@@ -53,7 +53,7 @@
                 comments.forEach(comment => {
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
-                        <p>작성자: <a href="/guestbook/guestbookpage?userId=${comment.user.id}">${comment.user.nickname}</a></p>
+                        <p>작성자: <a href="/user/${comment.user.id}/guestbook">${comment.user.nickname}</a></p>
                         <p>${comment.content}</p>
                         <p id="commentLikeCount${comment.id}">추천: ${comment.likeCount}</p>
                         <button class="likeComment" data-comment-id="${comment.id}">추천</button>
@@ -79,7 +79,7 @@
                             recomments.forEach(recomment => {
                                 const recommentItem = document.createElement('li');
                                 recommentItem.innerHTML = `
-                                    <p>작성자: <a href="/guestbook/guestbookpage?userId=${recomment.user.id}">${recomment.user.nickname}</a></p>
+                                    <p>작성자: <a href="/user/${recomment.user.id}/guestbook">${recomment.user.nickname}</a></p>
                                     <p>${recomment.content}</p>
                                     <p id="recommentLikeCount${recomment.id}">추천: ${recomment.likeCount}</p>
                                     <button class="likeRecomment" data-recomment-id="${recomment.id}">추천</button>

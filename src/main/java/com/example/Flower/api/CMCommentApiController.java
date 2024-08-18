@@ -77,9 +77,4 @@ public class CMCommentApiController extends SessionCheckController {
         return comment != null ? ResponseEntity.ok(comment.getLikeCount()) : ResponseEntity.notFound().build(); // 댓글이 존재할 경우 좋아요 수 반환, 그렇지 않으면 404 응답
     }
 
-    //방명록에서 사용자의 댓글을 출력
-    @GetMapping("/user/{userId}")
-    public List<CMComment> getCommentsByUser(@PathVariable Long userId) {
-        return cmCommentService.findCommentsByUserId(userId);
-    }
 }

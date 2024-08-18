@@ -137,4 +137,27 @@ public class CMPostApiController extends SessionCheckController {
             );
         }).collect(Collectors.toList());
     }
+
+    // 특정 사용자가 작성한 게시글을 내림차순으로 반환
+    @GetMapping("/user/{userId}/posts")
+    public ResponseEntity<List<CMPostForm>> getPostsByUser(@PathVariable Long userId) {
+        logger.info("Requesting posts by user: User ID {}", userId); // 사용자의 게시글 요청
+        List<CMPost> posts = cmPostService.findPostsByUserId(userId); // 사용자의 게시글 조회
+        List<CMPostForm> postForms = posts.stream().map(post -> { // 각 게시글을 CMPostForm으로 변환
+            List<String> pictureBase64List = post.getPictures() != null ? post.getPictures().stream()
+                    .map(Base64.getEncoder()::encodeToString).collect(Collectors.toList()) : null; // 사진을 Base64로 인코딩
+            return new CMPostForm(
+                    post.getId(),
+                    post.getUser(),
+                    post.getTitle(),
+                    post.getContent(),
+                    pictureBase64List,
+                    post.getLikeCount(),
+                    post.getRegdate(),
+                    post.getCount()
+            );
+        }).collect(Collectors.toList()); // 변환된 게시글 리스트로 수집
+        logger.info("Posts by user retrieved successfully: User ID {}", userId); // 사용자의 게시글 조회 완료
+        return ResponseEntity.ok(postForms); // 조회된 게시글 목록 반환
+    }
 }

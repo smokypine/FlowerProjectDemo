@@ -119,6 +119,11 @@ public class UserController extends SessionCheckController {
     }
 
     //사용자의 방명록으로 이동
-
+    @GetMapping("/user/{id}/guestbook")
+    public String goToGuestBook(@PathVariable Long id, Model model) {
+        User userEntity = userService.findUserById(id);
+        model.addAttribute("user", userEntity);
+        return "guestbook/guestbookpage";
+    }
 
 }

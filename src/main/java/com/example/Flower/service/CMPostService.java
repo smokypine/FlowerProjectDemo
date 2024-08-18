@@ -52,4 +52,9 @@ public class CMPostService {
     public List<CMPost> findTop4PostsDesc() {
         return cmPostRepository.findTop4ByOrderByRegdateDesc(); // 내림차순으로 정렬
     }
+
+    // 특정 사용자가 작성한 게시글을 내림차순으로 조회하는 메서드
+    public List<CMPost> findPostsByUserId(Long userId) {
+        return cmPostRepository.findByUserIdOrderByRegdateDesc(userId); // 사용자의 게시글을 내림차순으로 정렬하여 조회
+    }
 }

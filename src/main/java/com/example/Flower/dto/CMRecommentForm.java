@@ -2,8 +2,13 @@ package com.example.Flower.dto;
 
 import com.example.Flower.entity.CMComment;
 import com.example.Flower.entity.CMRecomment;
+import com.example.Flower.entity.CMPost; // CMPost import 추가
 import com.example.Flower.entity.User;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -16,12 +21,13 @@ public class CMRecommentForm {
     private Long id; // 대댓글 ID
     private CMComment cmCommentId; // 댓글 ID
     private User userId; // 사용자 ID
+    private CMPost cmPostId; // 게시글 ID 추가
     private String content; // 대댓글 내용
     private int likeCount; // 대댓글 좋아요
     private LocalDateTime regdate; // 작성 시간
 
     // 엔티티로 변환하는 메서드
     public CMRecomment toEntity(User loginUser) {
-        return new CMRecomment(id, cmCommentId, userId, content, likeCount, regdate);
+        return new CMRecomment(id, cmCommentId, userId, cmPostId, content, likeCount, regdate);
     }
 }
