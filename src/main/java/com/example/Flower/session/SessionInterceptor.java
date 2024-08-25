@@ -14,17 +14,7 @@ public class SessionInterceptor implements HandlerInterceptor {
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("userId") != null) {
             request.setAttribute("loggedIn", true);
-
-            // userId의 타입을 확인하고 적절하게 처리
-            Object userId = session.getAttribute("userId");
-            if (userId instanceof Long) {
-                request.setAttribute("loggedInUserId", userId.toString());
-            } else if (userId instanceof String) {
-                request.setAttribute("loggedInUserId", userId);
-            } else {
-                // 예상하지 못한 타입일 경우 처리 (Optional)
-                request.setAttribute("loggedInUserId", userId.toString());
-            }
+            request.setAttribute("loggedInUserId", (String) session.getAttribute("userId"));
         } else {
             request.setAttribute("loggedIn", false);
         }
