@@ -18,6 +18,7 @@ MySql 연동 상태. 다만 이 점을 지켜줄 것.
 <p>User</p>
 <p>UserRole</p>
 <br>
+
 <h4>dto 폴더</h4>
 <p>UserForm</p>
 <br>
@@ -38,4 +39,8 @@ MySql 연동 상태. 다만 이 점을 지켜줄 것.
     <p>@PostMapping("/join") public User joinUser(@RequestBody UserForm form) {...} 과 UserService의 @Transactional public User saveUser(User user) {...} 가 각각 연관됨.</p>
 <h4>users 폴더의</h4>
 <p>edit, index 또한 UserService와 UserApiController과 연관되어 있음.</p>
+
+
+
+[졸업프로젝트 테이블 목록.xlsx](https://github.com/user-attachments/files/16740113/default.xlsx)
 
